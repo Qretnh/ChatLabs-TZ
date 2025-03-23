@@ -55,7 +55,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
-HASHID_FIELD_SALT = 'ваша_соль_здесь'
+HASHID_FIELD_SALT = 'salt'
 
 TEMPLATES = [
     {
