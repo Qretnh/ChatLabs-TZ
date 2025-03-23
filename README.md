@@ -1,6 +1,4 @@
-# ChatLabs-TZ
-
-<h1>стек</h1>
+<h1>Стек</h1>
 
 Бэкенд: django + DRF
 
