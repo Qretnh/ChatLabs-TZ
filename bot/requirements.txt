@@ -1,0 +1,9 @@
+aiogram
+aiogram_dialog
+environs
+httpx
+requests
+aiohttp~=3.10.11
+aiohappyeyeballs~=2.4.4
+python-dotenv~=1.0.1
+cachetools~=5.5.1

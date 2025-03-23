@@ -1,0 +1,86 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: todolist_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: qwaszx12
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    networks:
+      - bot-network
+
+  django:
+    build: backend
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py createsuperuser --noinput --username admin --email admin@example.com || true &&
+             python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    restart: always
+    networks:
+      - bot-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - bot-network
+    restart: always
+
+
+  celery:
+    build: ./backend
+    command: celery -A backend worker --loglevel=info --pool=solo
+    volumes:
+      - ./backend:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    env_file:
+      - .env
+    depends_on:
+      - django
+      - redis
+      - postgres
+    networks:
+      - bot-network
+    restart: always
+
+  celery-beat:
+    build: ./backend
+    command: celery -A backend beat --loglevel=info
+    volumes:
+      - ./backend:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - django
+      - redis
+      - postgres
+    networks:
+      - bot-network
+    restart: always
+  
+
+  bot:
+    build: ./bot
+    command: python -m main
+    env_file:
+      - .env
+    networks:
+      - bot-network
+
+networks:
+  bot-network:
+    driver: bridge
