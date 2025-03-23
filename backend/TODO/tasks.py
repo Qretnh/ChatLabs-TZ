@@ -6,7 +6,7 @@ from .services.send_notification import send_notification
 
 @shared_task
 def check_and_notify_tasks():
-    tasks_due = Task.objects.filter(due_date__lte=now(), notified=False)
+    tasks_due = Task.objects.filter(due_date__lte=now(), notified=False, is_completed=False)
     for task in tasks_due:
         send_notification(task)
         task.notified = True
