@@ -23,7 +23,6 @@ async def update_task_status(task_id: str,
             response.raise_for_status()
             return True
         except httpx.HTTPError as e:
-            print(f"Ошибка при обновлении описания задачи: {e}")
             return False
 
 
@@ -39,7 +38,6 @@ async def update_task_description(task_id: str,
             response.raise_for_status()
             return True
         except httpx.HTTPError as e:
-            print(f"Ошибка при обновлении описания задачи: {e}")
             return False
 
 
@@ -51,7 +49,6 @@ async def get_tasks(telegram_id: str) -> list:
             logging.Logger("s").critical(response.json())
             return response.json()
         except httpx.HTTPError as e:
-            print(f"Ошибка при получении задач: {e}")
             return []
 
 
