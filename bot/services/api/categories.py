@@ -17,7 +17,6 @@ async def get_categories(telegram_id: str) -> list:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError as e:
-            print(f"Ошибка при получении категорий: {e}")
             return []
 
 async def create_category(name: str, user_id: int) -> dict:
@@ -28,7 +27,6 @@ async def create_category(name: str, user_id: int) -> dict:
     async with httpx.AsyncClient() as client:
         response = await client.post(f'{BASE_URL}categories/', json=payload)
         if response.status_code != 201:
-            print(f"Ошибка создания категории: {response.text}")
             response.raise_for_status()
         return response.json()
 
