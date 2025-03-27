@@ -16,8 +16,6 @@ from FSM import FSMTodoList
 from services.api.tasks import get_tasks, create_task, delete_task
 from services.api.categories import get_categories, create_category, delete_category
 
-from environs import Env
-
 from .getters import *
 from .functions import *
 
