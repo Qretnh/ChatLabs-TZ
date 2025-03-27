@@ -1,7 +1,7 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class TASKS(StatesGroup):
+class FSMTodoList(StatesGroup):
     start = State()
 
     my_tasks = State()
