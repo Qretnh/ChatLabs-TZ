@@ -21,16 +21,6 @@ from environs import Env
 from .getters import *
 from .functions import *
 
-env = Env()
-env.read_env()
-
-BASE_URL = env("API_BASE_URL")
-
-DEFAULT_TIME = "18:00"
-
-### ---------------- DIALOG -------------------
-
-
 tasks_dialog = Dialog(
     Window(
         Const("Ваш персональный TO-DO лист\n\n"
