@@ -11,7 +11,7 @@ from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 
 from datetime import date
 
-from FSM import TASKS
+from FSM import FSMTodoList
 
 from services.api.tasks import get_tasks, create_task, delete_task, update_task_status, update_task_description
 from services.api.categories import get_categories, create_category, delete_category
@@ -65,7 +65,7 @@ async def view_task_detail(callback: CallbackQuery,
     task = next((task for task in all_tasks if task['id'] == item_id), None)
     dialog_manager.dialog_data['task'] = task
 
-    await dialog_manager.switch_to(TASKS.task_detail)
+    await dialog_manager.switch_to(FSMTodoList.task_detail)
 
 
 async def view_task_archive(callback: CallbackQuery,
@@ -78,18 +78,18 @@ async def view_task_archive(callback: CallbackQuery,
     task = next((task for task in all_tasks if task['id'] == item_id), None)
     dialog_manager.dialog_data['task'] = task
 
-    await dialog_manager.switch_to(TASKS.archive_task_detail)
+    await dialog_manager.switch_to(FSMTodoList.archive_task_detail)
 
 
 async def delete_task_handler(callback: CallbackQuery, button: Button,
                               dialog_manager: DialogManager):
     await delete_task(dialog_manager.dialog_data['task_id'])
-    await dialog_manager.switch_to(TASKS.tasks_by_category)
+    await dialog_manager.switch_to(FSMTodoList.tasks_by_category)
 
 async def complete_task_handler(callback: CallbackQuery, button: Button,
                               dialog_manager: DialogManager):
     await update_task_status(dialog_manager.dialog_data['task_id'], 1)
-    await dialog_manager.switch_to(TASKS.tasks_by_category)
+    await dialog_manager.switch_to(FSMTodoList.tasks_by_category)
 
 
 async def delete_category_handler(callback: CallbackQuery,
@@ -120,7 +120,7 @@ async def on_description_entered(message: Message,
     task = dialog_manager.dialog_data['task']
     task['description'] = text
     await update_task_description(task['id'], text)
-    await dialog_manager.switch_to(TASKS.task_detail)
+    await dialog_manager.switch_to(FSMTodoList.task_detail)
 
 
 async def on_description_updated(message: Message,
@@ -144,7 +144,7 @@ async def on_category_select_for_tasks(callback: CallbackQuery,
                                        dialog_manager: DialogManager,
                                        item_id: str):
     dialog_manager.dialog_data['selected_category'] = item_id
-    await dialog_manager.switch_to(TASKS.task_list_by_category)
+    await dialog_manager.switch_to(FSMTodoList.task_list_by_category)
 
 
 async def on_create_category(message: Message,
@@ -165,7 +165,7 @@ async def on_create_category_from_categories(message: Message,
     if text not in cat_names:
         new_cat = await create_category(text, message.from_user.id)
 
-    await dialog_manager.switch_to(TASKS.change_category)
+    await dialog_manager.switch_to(FSMTodoList.change_category)
 
 
 async def on_date_selected(callback: CallbackQuery,
@@ -180,7 +180,7 @@ async def on_date_selected(callback: CallbackQuery,
 async def on_add_task(callback: CallbackQuery,
                       button: Button,
                       dialog_manager: DialogManager):
-    await dialog_manager.start(TASKS.add_task, data=dialog_manager.start_data)
+    await dialog_manager.start(FSMTodoList.add_task, data=dialog_manager.start_data)
 
 
 # Обработка ввода названия
@@ -204,4 +204,4 @@ async def on_confirm(callback: CallbackQuery,
         category_id=data.get("category_id"),
         description=data.get("description")
     )
-    await dialog_manager.switch_to(TASKS.my_tasks)
+    await dialog_manager.switch_to(FSMTodoList.my_tasks)
