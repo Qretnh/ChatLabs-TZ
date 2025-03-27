@@ -11,19 +11,10 @@ from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 
 from datetime import date
 
-from FSM import TASKS
+from FSM import FSMTodoList
 
 from services.api.tasks import get_tasks, create_task, delete_task
 from services.api.categories import get_categories, create_category, delete_category
-
-from environs import Env
-
-env = Env()
-env.read_env()
-
-BASE_URL = env("API_BASE_URL")
-
-DEFAULT_TIME = "18:00"
 
 
 async def getter_categories(dialog_manager: DialogManager,
