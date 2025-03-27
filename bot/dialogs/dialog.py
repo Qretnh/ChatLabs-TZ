@@ -11,7 +11,7 @@ from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 
 from datetime import date
 
-from FSM import TASKS
+from FSM import FSMTodoList
 
 from services.api.tasks import get_tasks, create_task, delete_task
 from services.api.categories import get_categories, create_category, delete_category
@@ -36,20 +36,20 @@ tasks_dialog = Dialog(
               "Просмотреть завершенные задачи"),
         SwitchTo(Const("➕ Добавить задачу"),
                  id='add_task',
-                 state=TASKS.add_task),
+                 state=FSMTodoList.add_task),
         SwitchTo(Const("📖 Просмотреть все задачи"),
                  id='open_tasks',
-                 state=TASKS.my_tasks),
+                 state=FSMTodoList.my_tasks),
         SwitchTo(Const("📋 Управление задачами"),
                  id='tasks_by_category',
-                 state=TASKS.tasks_by_category),
+                 state=FSMTodoList.tasks_by_category),
         SwitchTo(Const("✏️ Изменить категории"),
                  id='change_category',
-                 state=TASKS.change_category),
+                 state=FSMTodoList.change_category),
         SwitchTo(Const("📁 Архив"),
                  id='archive',
-                 state=TASKS.archive),
-        state=TASKS.start
+                 state=FSMTodoList.archive),
+        state=FSMTodoList.start
     ),
 
     # Вывод списка задач
@@ -61,8 +61,8 @@ tasks_dialog = Dialog(
                on_click=on_add_task),
         SwitchTo(Const("🔙 Назад"),
                  id='confirm_task_',
-                 state=TASKS.start),
-        state=TASKS.my_tasks,
+                 state=FSMTodoList.start),
+        state=FSMTodoList.my_tasks,
         getter=getter_tasks_data
     ),
 
@@ -74,7 +74,7 @@ tasks_dialog = Dialog(
                   type_factory=lambda text: text,
                   on_success=save_title),
         Back(Const("🔙 Назад")),
-        state=TASKS.add_task
+        state=FSMTodoList.add_task
     ),
 
     # Выбор даты выполнения
@@ -84,7 +84,7 @@ tasks_dialog = Dialog(
                  config=CalendarConfig(min_date=datetime.date.today()),
                  on_click=on_date_selected),
         Back(Const("🔙 Назад")),
-        state=TASKS.pick_date
+        state=FSMTodoList.pick_date
     ),
 
     # Выбор категории для создания
@@ -103,7 +103,7 @@ tasks_dialog = Dialog(
             on_success=on_create_category
         ),
         Back(Const("🔙 Назад")),
-        state=TASKS.pick_category,
+        state=FSMTodoList.pick_category,
         getter=getter_categories
     ),
 
@@ -119,7 +119,7 @@ tasks_dialog = Dialog(
                id="no_desc",
                on_click=on_no_description),
         Back(Const("🔙 Назад")),
-        state=TASKS.input_description
+        state=FSMTodoList.input_description
     ),
 
     # Ввод времени выполнения задачи (Дефолт 18:00)
@@ -135,7 +135,7 @@ tasks_dialog = Dialog(
                id="skip_time",
                on_click=on_skip_time),
         Back(Const("🔙 Назад")),
-        state=TASKS.input_time
+        state=FSMTodoList.input_time
     ),
 
     # Подтверждение выполнения таски
@@ -150,7 +150,7 @@ tasks_dialog = Dialog(
                on_click=on_confirm),
         Back(Const("🔙 Назад")),
         getter=getter_confirm_task,
-        state=TASKS.confirm_task
+        state=FSMTodoList.confirm_task
     ),
 
     # Выбор категории при просмотре задач по категориям
@@ -171,9 +171,9 @@ tasks_dialog = Dialog(
         ),
         SwitchTo(Const("🔙 Назад"),
                  id="back_from_manage_categories",
-                 state=TASKS.start),
+                 state=FSMTodoList.start),
         getter=getter_tasks_by_category,
-        state=TASKS.tasks_by_category
+        state=FSMTodoList.tasks_by_category
     ),
 
     # Окно задач в категории
@@ -193,7 +193,7 @@ tasks_dialog = Dialog(
         ),
         Back(Const("🔙 Назад")),
         getter=getter_selected_category_tasks,
-        state=TASKS.task_list_by_category
+        state=FSMTodoList.task_list_by_category
     ),
 
     # Окно таски
@@ -211,10 +211,10 @@ tasks_dialog = Dialog(
                on_click=delete_task_handler),
         SwitchTo(Const("✍️ Обновить описание"),
                  id='update_description',
-                 state=TASKS.update_task_description),
+                 state=FSMTodoList.update_task_description),
         Back(Const("🔙 Назад")),
         getter=getter_task,
-        state=TASKS.task_detail
+        state=FSMTodoList.task_detail
     ),
 
     # Окно категорий
@@ -235,12 +235,12 @@ tasks_dialog = Dialog(
         ),
         SwitchTo(Const("✍️ Добавить категорию"),
                  id="add_new_category",
-                 state=TASKS.add_new_category),
+                 state=FSMTodoList.add_new_category),
         SwitchTo(Const("🔙 Назад"),
                  id="back_from_manage_categories",
-                 state=TASKS.start),
+                 state=FSMTodoList.start),
         getter=getter_manage_categories,
-        state=TASKS.change_category
+        state=FSMTodoList.change_category
     ),
 
     # Ввод названия новой категории
@@ -252,7 +252,7 @@ tasks_dialog = Dialog(
             on_success=on_create_category_from_categories
         ),
         Back(Const("🔙 Назад")),
-        state=TASKS.add_new_category
+        state=FSMTodoList.add_new_category
     ),
 
     # Ввод нового описания задачи
@@ -263,7 +263,7 @@ tasks_dialog = Dialog(
             type_factory=lambda text: text,
             on_success=on_description_entered
         ),
-        state=TASKS.update_task_description
+        state=FSMTodoList.update_task_description
     ),
 
     # Архив - выполненные таски
@@ -283,9 +283,9 @@ tasks_dialog = Dialog(
         ),
         SwitchTo(Const("🔙 Назад"),
                  id='back_from_archive',
-                 state=TASKS.start),
+                 state=FSMTodoList.start),
         getter=getter_archive,
-        state=TASKS.archive
+        state=FSMTodoList.archive
     ),
 
     # Окно архивной таски
@@ -301,7 +301,8 @@ tasks_dialog = Dialog(
                on_click=delete_task_handler),
         Back(Const("🔙 Назад")),
         getter=getter_task,
-        state=TASKS.archive_task_detail
+        state=FSMTodoList.archive_task_detail
     ),
 
 )
+
