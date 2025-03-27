@@ -8,5 +8,4 @@ router.register(r'categories', CategoryViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('users/', UserCreateAPIView.as_view(), name='user-create'),  # сюда!
-]
+    path('users/', UserCreateAPIView.as_view(), name='user-create'),
