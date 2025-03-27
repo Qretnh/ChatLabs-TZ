@@ -14,7 +14,6 @@ class TaskViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except serializers.ValidationError as e:
-            print("Validation Error:", e.detail)
             logger.error(f"Validation Error: {e.detail}")
             raise
 
