@@ -16,12 +16,12 @@ from dialogs.dialog import tasks_dialog
 
 from config.config import get_settings
 
-config = get_settings()
-
-bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-
 
 async def main():
+    config = get_settings()
+
+    bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+
     dp = Dispatcher()
 
     logger = logging.getLogger(__name__)
