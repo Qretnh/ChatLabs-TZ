@@ -1,20 +1,7 @@
-import datetime
-import logging
-
-from aiogram import Dispatcher
-from aiogram.types import Message, CallbackQuery
-
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.kbd import Button, Back, Calendar, Select, CalendarConfig, SwitchTo, ScrollingGroup
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
-
-from datetime import date
-
-from FSM import FSMTodoList
-
-from services.api.tasks import get_tasks, create_task, delete_task
-from services.api.categories import get_categories, create_category, delete_category
 
 from .getters import *
 from .functions import *

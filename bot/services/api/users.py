@@ -1,18 +1,19 @@
 import httpx
 
 from environs import Env
+from config.config import get_settings
 
-env = Env()
-env.read_env()
+config = get_settings()
 
-BASE_URL = env("API_BASE_URL")
 
-async def register_user(telegram_id: str, username: str):
-    payload = {
-        "telegram_id": telegram_id,
-        "username": username
-    }
-    async with httpx.AsyncClient() as client:
-        response = await client.post(f"{BASE_URL}users/", json=payload)
-        response.raise_for_status()
-        return response.json()
+class api_users:
+    @staticmethod
+    async def register_user(telegram_id: str, username: str):
+        payload = {
+            "telegram_id": telegram_id,
+            "username": username
+        }
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{config.api_base_url}users/", json=payload)
+            response.raise_for_status()
+            return response.json()

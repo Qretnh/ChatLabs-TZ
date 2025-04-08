@@ -16,6 +16,7 @@ services:
       retries: 10
     networks:
       - bot-network
+    entrypoint: /bin/sh -c "mkdir -p /var/lib/postgresql/data && docker-entrypoint.sh postgres"
 
   django:
     build: backend
