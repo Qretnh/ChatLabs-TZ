@@ -1,23 +1,19 @@
 import datetime
-import logging
 
-from aiogram import Dispatcher
 from aiogram.types import Message, CallbackQuery
 
-from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.kbd import Button, Back, Calendar, Select, CalendarConfig, SwitchTo, ScrollingGroup
-from aiogram_dialog.widgets.text import Const, Format
-from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
+from aiogram_dialog import DialogManager
+from aiogram_dialog.widgets.kbd import Button, Select
+from aiogram_dialog.widgets.input import ManagedTextInput
 
 from datetime import date
 
 from FSM import FSMTodoList
 
-from services.api.tasks import get_tasks, create_task, delete_task, update_task_status, update_task_description
-from services.api.categories import get_categories, create_category, delete_category
+from services.api.tasks import api_tasks
+from services.api.categories import api_categories
 
 from environs import Env
-
 
 env = Env()
 env.read_env()
@@ -83,12 +79,13 @@ async def view_task_archive(callback: CallbackQuery,
 
 async def delete_task_handler(callback: CallbackQuery, button: Button,
                               dialog_manager: DialogManager):
-    await delete_task(dialog_manager.dialog_data['task_id'])
+    await api_tasks.delete_task(dialog_manager.dialog_data['task_id'])
     await dialog_manager.switch_to(FSMTodoList.tasks_by_category)
 
+
 async def complete_task_handler(callback: CallbackQuery, button: Button,
-                              dialog_manager: DialogManager):
-    await update_task_status(dialog_manager.dialog_data['task_id'], 1)
+                                dialog_manager: DialogManager):
+    await api_tasks.update_task_status(dialog_manager.dialog_data['task_id'], True)
     await dialog_manager.switch_to(FSMTodoList.tasks_by_category)
 
 
@@ -99,14 +96,14 @@ async def delete_category_handler(callback: CallbackQuery,
     telegram_id = str(callback.from_user.id)
 
     # Получаем все задачи пользователя
-    tasks = await get_tasks(telegram_id)
+    tasks = await api_tasks.get_tasks(telegram_id)
     tasks_in_category = [task for task in tasks if str(task["category"]['id']) == str(item_id)]
 
     if tasks_in_category:
         await callback.answer("Нельзя удалить категорию — в ней есть задачи!", show_alert=True)
         return
 
-    success = await delete_category(item_id, callback.from_user.id)
+    success = await api_categories.delete_category(item_id, callback.from_user.id)
     if success:
         await callback.answer("Категория удалена")
     else:
@@ -119,7 +116,7 @@ async def on_description_entered(message: Message,
                                  text: str):
     task = dialog_manager.dialog_data['task']
     task['description'] = text
-    await update_task_description(task['id'], text)
+    await api_tasks.update_task_description(task['id'], text)
     await dialog_manager.switch_to(FSMTodoList.task_detail)
 
 
@@ -151,7 +148,7 @@ async def on_create_category(message: Message,
                              widget: ManagedTextInput,
                              dialog_manager: DialogManager,
                              text: str):
-    new_cat = await create_category(text, message.from_user.id)
+    new_cat = await api_categories.create_category(text, message.from_user.id)
     dialog_manager.dialog_data["category_id"] = new_cat["id"]
     await dialog_manager.next()
 
@@ -160,10 +157,10 @@ async def on_create_category_from_categories(message: Message,
                                              widget: ManagedTextInput,
                                              dialog_manager: DialogManager,
                                              text: str):
-    categories = await get_categories(message.from_user.id)
+    categories = await api_categories.get_categories(message.from_user.id)
     cat_names = [cat["name"] for cat in categories]
     if text not in cat_names:
-        new_cat = await create_category(text, message.from_user.id)
+        new_cat = await api_categories.create_category(text, message.from_user.id)
 
     await dialog_manager.switch_to(FSMTodoList.change_category)
 
@@ -196,8 +193,8 @@ async def on_confirm(callback: CallbackQuery,
                      dialog_manager: DialogManager):
     data = dialog_manager.dialog_data
     telegram_id = callback.from_user.id
-    await create_task(
-        telegram_id=telegram_id,
+    await api_tasks.create_task(
+        telegram_id=str(telegram_id),
         title=data["title"],
         due_date=data.get("due_date"),
         due_time=data.get("due_time"),

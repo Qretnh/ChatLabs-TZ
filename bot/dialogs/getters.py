@@ -1,25 +1,16 @@
-import datetime
 import logging
 
 from aiogram import Dispatcher
-from aiogram.types import Message, CallbackQuery
 
-from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.kbd import Button, Back, Calendar, Select, CalendarConfig, SwitchTo, ScrollingGroup
-from aiogram_dialog.widgets.text import Const, Format
-from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
+from aiogram_dialog import DialogManager
 
-from datetime import date
-
-from FSM import FSMTodoList
-
-from services.api.tasks import get_tasks, create_task, delete_task
-from services.api.categories import get_categories, create_category, delete_category
+from services.api.tasks import api_tasks
+from services.api.categories import api_categories
 
 
 async def getter_categories(dialog_manager: DialogManager,
                             **kwargs):
-    categories = await get_categories(dialog_manager.start_data['user_id'])
+    categories = await api_categories.get_categories(dialog_manager.start_data['user_id'])
     dialog_manager.dialog_data["categories"] = categories
     return {"categories": categories}
 
@@ -33,7 +24,7 @@ async def getter_task(dialog_manager: DialogManager, **kwargs):
 async def getter_tasks_data(dialog_manager: DialogManager,
                             **kwargs):
     user_id = dialog_manager.start_data["user_id"]
-    tasks = await get_tasks(user_id)
+    tasks = await api_tasks.get_tasks(user_id)
     actual_tasks = [task for task in tasks if task['is_completed'] == False]
     logging.getLogger(__name__).debug(f"Tasks fetched: {tasks}")
     formatted = "\n".join([f"📌 {task['title']}\n"
@@ -59,7 +50,7 @@ async def getter_confirm_task(dialog_manager: DialogManager,
 async def getter_tasks_by_category(dialog_manager: DialogManager,
                                    **kwargs):
     user_id = dialog_manager.start_data['user_id']
-    tasks = await get_tasks(user_id)
+    tasks = await api_tasks.get_tasks(user_id)
 
     categories = {}
     for task in tasks:
@@ -74,7 +65,7 @@ async def getter_tasks_by_category(dialog_manager: DialogManager,
 async def getter_selected_category_tasks(dialog_manager: DialogManager,
                                          **kwargs):
     user_id = dialog_manager.start_data['user_id']
-    tasks = await get_tasks(user_id)
+    tasks = await api_tasks.get_tasks(user_id)
     tasks = [task for task in tasks if task['is_completed'] == False]
     selected_category = dialog_manager.dialog_data['selected_category']
     filtered = [task for task in tasks if (task['category'] and task['category']['name'] == selected_category) or (
@@ -88,14 +79,14 @@ async def getter_selected_category_tasks(dialog_manager: DialogManager,
 async def getter_manage_categories(dialog_manager: DialogManager,
                                    **kwargs):
     user_id = dialog_manager.start_data['user_id']
-    categories = await get_categories(user_id)
+    categories = await api_categories.get_categories(user_id)
     return {"categories": categories}
 
 
 async def getter_archive(dialog_manager: DialogManager,
                          **kwargs):
     user_id = dialog_manager.start_data['user_id']
-    tasks = await get_tasks(user_id)
+    tasks = await api_tasks.get_tasks(user_id)
 
     tasks = [task for task in tasks if task['is_completed']]
     dialog_manager.dialog_data['archive_tasks'] = tasks

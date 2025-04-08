@@ -8,18 +8,17 @@ from aiogram.types import BotCommand
 
 from aiogram_dialog import setup_dialogs
 
-from environs import Env
-
 import logging
 
 from handlers.menu import router as menu
 
 from dialogs.dialog import tasks_dialog
 
-env = Env()
-env.read_env()
-BOT_TOKEN = env('BOT_TOKEN')
-bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+from config.config import get_settings
+
+config = get_settings()
+
+bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 
 async def main():

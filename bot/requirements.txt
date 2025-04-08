@@ -1,3 +1,5 @@
+pydantic
+pydantic-settings
 aiogram
 aiogram_dialog
 environs
